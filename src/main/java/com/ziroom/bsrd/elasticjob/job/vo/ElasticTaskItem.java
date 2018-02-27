@@ -13,7 +13,7 @@ import java.io.Serializable;
 public class ElasticTaskItem implements Serializable {
 
     /**
-     * 任务id
+     * 任务id 必须唯一，做为分片标识
      */
     private long taskId;
     /**
@@ -21,7 +21,7 @@ public class ElasticTaskItem implements Serializable {
      */
     private TaskItemStatus status = TaskItemStatus.ACTIVE;
     /**
-     * 管理的任务数据
+     * 任务数据信息
      */
     private Object object;
 

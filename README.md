@@ -1,7 +1,7 @@
 # elasticjob-spring-boot-starter
 自定义elasticjob的starter
 
-
+## 如何接入
 1. 添加maven依赖
 
     ```
@@ -24,3 +24,6 @@ zookeeper：
   serverLists:XXX
   namespace:XXX
  ```
+ ## 如果使用
+ 1. 创建任务类，继承`BusinessBatchElasticTask` 重写相应方法
+ 2. 添加注解`@JobConfig` 设置相关的信息

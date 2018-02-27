@@ -20,6 +20,12 @@ import java.util.concurrent.TimeUnit;
 public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleElasticJob {
 
 
+    /**
+     * 处理单个任务
+     *
+     * @param taskItem
+     * @return
+     */
     @Override
     protected abstract boolean processOne(ElasticTaskItem taskItem);
 
@@ -28,11 +34,15 @@ public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleEla
         return taskConfig;
     }
 
+    /**
+     * 返回任务的编码
+     * @return
+     */
     @Override
     protected abstract String getTaskCode();
 
     /**
-     * 是否批量处理
+     * 是否批量处理 默认单个处理
      *
      * @return
      */
@@ -74,11 +84,20 @@ public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleEla
         }
     }
 
+    /**
+     * 获取需要处理任务的数据，数据需要包装成<code>ElasticTaskItem</code>
+     *
+     * @param taskConfig 任务配置
+     * @param shardingContext
+     * @return
+     * @throws Exception
+     */
     @Override
     protected abstract List<ElasticTaskItem> getAllProcessData(TaskConfig taskConfig, JobExecutionMultipleShardingContext shardingContext) throws Exception;
 
     /**
-     * 获取单个任务的执行器
+     * 多线程处理时，单个任务的处理器<br/>
+     * 任务放在处理器中执行 批量处理时需要重写
      *
      * @return
      */
@@ -90,6 +109,11 @@ public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleEla
     }
 
 
+    /**
+     * 批量处理时需要重写<br/>
+     * 多线程处理时返回线程池
+     * @return
+     */
     public ThreadPoolTaskExecutor getExecutorService() {
         if (isProcessAll()) {
             throw new RuntimeException(" isProcessAll is true and imp getExecutorService method ");

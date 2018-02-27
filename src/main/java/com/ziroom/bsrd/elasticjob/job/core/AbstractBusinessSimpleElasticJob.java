@@ -127,6 +127,11 @@ public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleEla
         ApplicationEnvironment.setSessionVoThreadLocal(sessionVo);
     }
 
+    /**
+     * 返回任务的线程配置，处理数据量信息
+     *
+     * @return
+     */
     protected abstract TaskConfig getTaskConfig();
 
 
