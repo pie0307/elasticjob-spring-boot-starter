@@ -4,14 +4,14 @@
 
     <groupId>com.ziroom.bsrd</groupId>
     <artifactId>elasticjob-spring-boot-starter</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <!-- 引用依赖的父包 -->
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.4.1.RELEASE</version>
+        <groupId>com.ziroom.bsrd</groupId>
+        <artifactId>lib-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <name>elasticjob-spring-boot-starter</name>
@@ -20,8 +20,20 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <elastic-job.version>0.0.2</elastic-job.version>
-        <logger.version>1.0.0</logger.version>
+        <lib-all.version>1.0.0-SNAPSHOT</lib-all.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-parent</artifactId>
+                <version>1.4.1.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -35,8 +47,8 @@
         </dependency>
         <dependency>
             <groupId>com.ziroom.bsrd</groupId>
-            <artifactId>logger</artifactId>
-            <version>${logger.version}</version>
+            <artifactId>lib-all</artifactId>
+            <version>${lib-all.version}</version>
         </dependency>
     </dependencies>
 
