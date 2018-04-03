@@ -26,4 +26,4 @@ zookeeper：
  ```
  ## 如果使用
  1. 创建任务类，继承`BusinessBatchElasticTask` 重写相应方法
- 2. 添加注解`@JobConfig` 设置相关的信息
+ 2. 添加注解`@JobConfig`设置相关的信息, 添加 `@Component`
