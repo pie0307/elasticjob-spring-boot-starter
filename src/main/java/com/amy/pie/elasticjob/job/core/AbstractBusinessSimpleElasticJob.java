@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleElasticJob {
 
-    private ThreadLocal<ElasticTaskItem.RunnerContext> runnerContextThreadLocal = new ThreadLocal<ElasticTaskItem.RunnerContext>();
+    private ThreadLocal<ElasticTaskItem.RunnerContext> runnerContextThreadLocal = new ThreadLocal<>();
 
     /**
      * 获取当前任务的上下文数据
@@ -55,7 +55,7 @@ public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleEla
             }
 
             //处理分片项和实际数据的对应关系
-            List<ElasticTaskItem> realToBeExecutedIdList = new ArrayList<ElasticTaskItem>();
+            List<ElasticTaskItem> realToBeExecutedIdList = new ArrayList<>();
             int shardingTotalCount = shardingContext.getShardingTotalCount();//分片总数
             //not find data
             if (taskItems == null || taskItems.size() == 0) {

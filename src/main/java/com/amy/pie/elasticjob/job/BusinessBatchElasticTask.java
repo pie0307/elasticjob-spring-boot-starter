@@ -92,7 +92,6 @@ public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleEla
         return null;
     }
 
-
     /**
      * 批量处理时需要重写<br/>
      * 多线程处理时返回线程池
