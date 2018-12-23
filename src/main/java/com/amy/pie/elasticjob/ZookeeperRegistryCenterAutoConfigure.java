@@ -1,6 +1,5 @@
-package com.ziroom.bsrd.elasticjob;
+package com.amy.pie.elasticjob;
 
-import com.dangdang.ddframe.context.JobApplicationContext;
 import com.dangdang.ddframe.reg.zookeeper.ZookeeperConfiguration;
 import com.dangdang.ddframe.reg.zookeeper.ZookeeperRegistryCenter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +10,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * @author chengys4
- *         2018-01-24 18:25
- **/
 @Configuration
 @ConditionalOnClass(ZookeeperRegistryCenter.class)
 @EnableConfigurationProperties(ZookeeperProperties.class)
@@ -30,11 +25,5 @@ public class ZookeeperRegistryCenterAutoConfigure {
         ZookeeperConfiguration zookeeperConfiguration =
                 new ZookeeperConfiguration(zookeeperProperties.getServerLists(), zookeeperProperties.getNamespace());
         return new ZookeeperRegistryCenter(zookeeperConfiguration);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public JobApplicationContext jobApplicationContext() {
-        return new JobApplicationContext();
     }
 }

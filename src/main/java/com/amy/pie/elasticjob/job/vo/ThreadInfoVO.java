@@ -1,4 +1,4 @@
-package com.ziroom.bsrd.elasticjob.job.vo;
+package com.amy.pie.elasticjob.job.vo;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -6,10 +6,6 @@ import lombok.Setter;
 
 import java.util.concurrent.Future;
 
-/**
- * @author chengys4
- *         2018-01-11 11:26
- **/
 @Getter
 @Setter
 @NoArgsConstructor

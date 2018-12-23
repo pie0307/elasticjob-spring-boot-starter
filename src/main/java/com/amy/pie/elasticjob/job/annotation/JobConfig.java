@@ -1,4 +1,4 @@
-package com.ziroom.bsrd.elasticjob.job.annotation;
+package com.amy.pie.elasticjob.job.annotation;
 
 
 import com.dangdang.ddframe.job.api.config.impl.JobType;
@@ -22,7 +22,6 @@ public @interface JobConfig {
      */
     JobType jobType() default JobType.SIMPLE;
 
-
     /**
      * 任务的名称 默认执行类类名首字母小写
      */
@@ -45,8 +44,6 @@ public @interface JobConfig {
 
     /**
      * 任务描述
-     *
-     * @return
      */
     String description() default "";
 }

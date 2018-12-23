@@ -1,12 +1,12 @@
-package com.ziroom.bsrd.elasticjob.job;
+package com.amy.pie.elasticjob.job;
 
+import com.amy.pie.elasticjob.job.core.TaskRunner;
+import com.amy.pie.elasticjob.job.itf.ITaskExecutor;
 import com.dangdang.ddframe.job.api.JobExecutionMultipleShardingContext;
-import com.ziroom.bsrd.elasticjob.job.core.AbstractBusinessSimpleElasticJob;
-import com.ziroom.bsrd.elasticjob.job.core.TaskRunner;
-import com.ziroom.bsrd.elasticjob.job.itf.ITaskExecutor;
-import com.ziroom.bsrd.elasticjob.job.vo.ElasticTaskItem;
-import com.ziroom.bsrd.elasticjob.job.vo.TaskConfig;
-import com.ziroom.bsrd.log.ApplicationLogger;
+import com.amy.pie.elasticjob.job.core.AbstractBusinessSimpleElasticJob;
+import com.amy.pie.elasticjob.job.vo.ElasticTaskItem;
+import com.amy.pie.elasticjob.job.vo.TaskConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.*;
@@ -17,14 +17,11 @@ import java.util.concurrent.TimeUnit;
 /**
  * 批量处理任务
  */
+@Slf4j
 public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleElasticJob {
-
 
     /**
      * 处理单个任务
-     *
-     * @param taskItem
-     * @return
      */
     @Override
     protected abstract boolean processOne(ElasticTaskItem taskItem);
@@ -36,15 +33,12 @@ public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleEla
 
     /**
      * 返回任务的编码
-     * @return
      */
     @Override
     protected abstract String getTaskCode();
 
     /**
      * 是否批量处理 默认单个处理
-     *
-     * @return
      */
     @Override
     protected boolean isProcessAll() {
@@ -53,15 +47,12 @@ public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleEla
 
     /**
      * 批量批量任务
-     *
-     * @param taskConfig
-     * @param taskItems
      */
     @Override
     protected void processAll(TaskConfig taskConfig, List<ElasticTaskItem> taskItems) {
         long start = System.currentTimeMillis();
         CountDownLatch latch = null;
-        ApplicationLogger.info_api(getTaskCode() + " handle : " + taskItems.size());
+        log.info(getTaskCode() + " handle : " + taskItems.size());
         try {
             Map<Integer, List<ElasticTaskItem>> data = parseData(taskConfig.getThreadNum(), taskItems);
             latch = new CountDownLatch(data.size());
@@ -73,24 +64,19 @@ public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleEla
                 Future<?> future = getExecutorService().submit(taskRunner);
             }
         } catch (Exception e) {
-            ApplicationLogger.error("bath handle fail：", e);
+            log.error("bath handle fail：", e);
         } finally {
             try {
                 latch.await(1, TimeUnit.HOURS);
             } catch (InterruptedException e) {
-                ApplicationLogger.error("CountDownLatch await error ", e);
+                log.error("CountDownLatch await error ", e);
             }
-            ApplicationLogger.info_api(getTaskCode() + " costtime " + (System.currentTimeMillis() - start) / 1000 + " s");
+            log.info(getTaskCode() + " costtime " + (System.currentTimeMillis() - start) / 1000 + " s");
         }
     }
 
     /**
      * 获取需要处理任务的数据，数据需要包装成<code>ElasticTaskItem</code>
-     *
-     * @param taskConfig 任务配置
-     * @param shardingContext
-     * @return
-     * @throws Exception
      */
     @Override
     protected abstract List<ElasticTaskItem> getAllProcessData(TaskConfig taskConfig, JobExecutionMultipleShardingContext shardingContext) throws Exception;
@@ -98,8 +84,6 @@ public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleEla
     /**
      * 多线程处理时，单个任务的处理器<br/>
      * 任务放在处理器中执行 批量处理时需要重写
-     *
-     * @return
      */
     public ITaskExecutor getTaskExecutorHandler() {
         if (isProcessAll()) {
@@ -112,7 +96,6 @@ public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleEla
     /**
      * 批量处理时需要重写<br/>
      * 多线程处理时返回线程池
-     * @return
      */
     public ThreadPoolTaskExecutor getExecutorService() {
         if (isProcessAll()) {
@@ -123,10 +106,6 @@ public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleEla
 
     /**
      * 把要处理的数据添加的分组
-     *
-     * @param map
-     * @param index
-     * @param item
      */
     private void addToMap(Map<Integer, List<ElasticTaskItem>> map, int index, ElasticTaskItem item) {
         List<ElasticTaskItem> data = map.get(Integer.valueOf(index));
@@ -138,11 +117,7 @@ public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleEla
     }
 
     /**
-     * 任务分发 TODO 分组策略需要抽出来 场景 用户会多次看直播  要求同一个用户的记录由同一个线程处理 。
-     *
-     * @param threadnum
-     * @param handledata
-     * @return
+     * 任务分发
      */
     private Map<Integer, List<ElasticTaskItem>> parseData(int threadnum, List<ElasticTaskItem> handledata) {
         Map<Integer, List<ElasticTaskItem>> map = new HashMap<Integer, List<ElasticTaskItem>>();

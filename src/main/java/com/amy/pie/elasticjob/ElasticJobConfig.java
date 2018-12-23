@@ -1,4 +1,4 @@
-package com.ziroom.bsrd.elasticjob;
+package com.amy.pie.elasticjob;
 
 import com.dangdang.ddframe.reg.base.CoordinatorRegistryCenter;
 import com.dangdang.ddframe.reg.zookeeper.ZookeeperConfiguration;
@@ -17,7 +17,6 @@ public class ElasticJobConfig {
     public CoordinatorRegistryCenter regCenter() {
         ZookeeperConfiguration zookeeperConfiguration =
                 new ZookeeperConfiguration(zookeeperProperties.getServerLists(), zookeeperProperties.getNamespace());
-
 
         return new ZookeeperRegistryCenter(zookeeperConfiguration);
     }

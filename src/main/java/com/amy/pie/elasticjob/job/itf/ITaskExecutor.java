@@ -1,7 +1,7 @@
-package com.ziroom.bsrd.elasticjob.job.itf;
+package com.amy.pie.elasticjob.job.itf;
 
 
-import com.ziroom.bsrd.elasticjob.job.vo.ElasticTaskItem;
+import com.amy.pie.elasticjob.job.vo.ElasticTaskItem;
 
 /**
  * 任务执行器

@@ -1,15 +1,16 @@
-package com.ziroom.bsrd.elasticjob.job.core;
+package com.amy.pie.elasticjob.job.core;
 
 
-import com.ziroom.bsrd.elasticjob.job.itf.ITaskExecutor;
-import com.ziroom.bsrd.elasticjob.job.vo.ElasticTaskItem;
-import com.ziroom.bsrd.log.ApplicationLogger;
+import com.amy.pie.elasticjob.job.itf.ITaskExecutor;
+import com.amy.pie.elasticjob.job.vo.ElasticTaskItem;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 /**
  * 任务线程执行器
  */
+@Slf4j
 public class TaskRunner extends SuperTask {
 
     private List<? extends ElasticTaskItem> value;
@@ -36,13 +37,13 @@ public class TaskRunner extends SuperTask {
     public Object call() {
 
         String threadName = runnerContext.getTaskCode() + "_" + Thread.currentThread().getName();
-        ApplicationLogger.info(threadName + " start ");
+        log.info(threadName + " start ");
         if (runnerContext == null) {
-            ApplicationLogger.info_api(" runnerContextThreadLocal is null");
+            log.info(" runnerContextThreadLocal is null");
             return SuperTaskStatus_ERROR;
         }
         if (value == null || value.isEmpty()) {
-            ApplicationLogger.info(threadName + " handle size=0 ");
+            log.info(threadName + " handle size=0 ");
             return SuperTaskStatus_SUCCESS;
         }
 
@@ -55,18 +56,18 @@ public class TaskRunner extends SuperTask {
                 try {
                     taskExecutorHandler.handle(item, runnerContext.getTaskCode());
                 } catch (Exception e) {
-                    ApplicationLogger.error(threadName + " run error ", e);
+                    log.error(threadName + " run error ", e);
                 }
             }
             return SuperTaskStatus_SUCCESS;
         } catch (Exception e) {
-            ApplicationLogger.error(threadName + " run error ", e);
+            log.error(threadName + " run error ", e);
             return SuperTaskStatus_ERROR;
         } finally {
             workDone();
             long times = (System.currentTimeMillis() - start);
             stringBuilder.append(" costtime ").append(times).append(" ms");
-            ApplicationLogger.info(stringBuilder.toString());
+            log.info(stringBuilder.toString());
         }
     }
 

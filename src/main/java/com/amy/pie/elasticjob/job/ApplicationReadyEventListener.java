@@ -1,12 +1,12 @@
-package com.ziroom.bsrd.elasticjob.job;
+package com.amy.pie.elasticjob.job;
 
+import com.amy.pie.elasticjob.job.vo.JobInfo;
 import com.dangdang.ddframe.job.api.JobScheduler;
 import com.dangdang.ddframe.job.api.config.JobConfigurationFactory;
 import com.dangdang.ddframe.job.api.config.impl.SimpleJobConfiguration;
 import com.dangdang.ddframe.reg.zookeeper.ZookeeperRegistryCenter;
-import com.ziroom.bsrd.elasticjob.job.annotation.JobConfig;
-import com.ziroom.bsrd.elasticjob.job.vo.JobInfo;
-import com.ziroom.bsrd.log.ApplicationLogger;
+import com.amy.pie.elasticjob.job.annotation.JobConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
@@ -21,11 +21,9 @@ import java.util.Map;
 
 /**
  * Spring Boot 上下文创建完成后执行的事件监听器
- *
- * @author chengys4
- *         2017-08-21 18:47
  **/
 @Component
+@Slf4j
 public class ApplicationReadyEventListener implements ApplicationListener<ContextRefreshedEvent> {
 
     private ApplicationContext applicationContext;
@@ -35,14 +33,14 @@ public class ApplicationReadyEventListener implements ApplicationListener<Contex
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        ApplicationLogger.info("ApplicationStartedEventListener is starting");
+        log.info("ApplicationStartedEventListener is starting");
 
         // 获取ApplicationContext
         setApplicationContext(contextRefreshedEvent.getApplicationContext());
 
         initJob();
 
-        ApplicationLogger.info("ApplicationStartedEventListener is started");
+        log.info("ApplicationStartedEventListener is started");
     }
 
     private void initJob() {

@@ -1,14 +1,12 @@
-package com.ziroom.bsrd.elasticjob.job.core;
+package com.amy.pie.elasticjob.job.core;
 
+import com.amy.pie.elasticjob.job.vo.ElasticTaskItem;
+import com.amy.pie.elasticjob.job.vo.TaskConfig;
 import com.dangdang.ddframe.job.api.JobExecutionMultipleShardingContext;
 import com.dangdang.ddframe.job.exception.JobException;
 import com.dangdang.ddframe.job.plugin.job.type.simple.AbstractSimpleElasticJob;
 import com.google.common.collect.Lists;
-import com.ziroom.bsrd.basic.vo.SessionVo;
-import com.ziroom.bsrd.core.ApplicationEnvironment;
-import com.ziroom.bsrd.elasticjob.job.vo.ElasticTaskItem;
-import com.ziroom.bsrd.elasticjob.job.vo.TaskConfig;
-import com.ziroom.bsrd.log.ApplicationLogger;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,15 +14,13 @@ import java.util.List;
 /**
  * 批量处理数据任务
  */
+@Slf4j
 public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleElasticJob {
 
     private ThreadLocal<ElasticTaskItem.RunnerContext> runnerContextThreadLocal = new ThreadLocal<ElasticTaskItem.RunnerContext>();
 
-
     /**
      * 获取当前任务的上下文数据
-     *
-     * @return
      */
     public ElasticTaskItem.RunnerContext getRunnerContext() {
         return runnerContextThreadLocal.get();
@@ -32,16 +28,10 @@ public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleEla
 
     /**
      * 任务调度入口  由ElasticJob 触发
-     *
-     * @param shardingContext
      */
     public void process(final JobExecutionMultipleShardingContext shardingContext) {
 
         jobStart(shardingContext);
-        /**
-         * 初始化上下文数据
-         */
-        initContextValue();
 
         StringBuilder logSB = new StringBuilder();
         boolean isPrintLog = false;
@@ -49,7 +39,7 @@ public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleEla
 
             logSB.append(getTaskCode() + "_task Start").append("-");
 
-            ApplicationLogger.info(getTaskCode() + "_begin");
+            log.info(getTaskCode() + "_begin");
 
             TaskConfig taskConfig = getTaskConfig();
 
@@ -60,7 +50,7 @@ public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleEla
             List<Integer> shardingItems = shardingContext.getShardingItems();
             if (shardingItems == null || shardingItems.isEmpty()) {
                 logSB.append("No sharding items");
-                ApplicationLogger.info(logSB.toString());//警告，该服务器未分配到分片项
+                log.info(logSB.toString());//警告，该服务器未分配到分片项
                 return;
             }
 
@@ -69,7 +59,7 @@ public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleEla
             int shardingTotalCount = shardingContext.getShardingTotalCount();//分片总数
             //not find data
             if (taskItems == null || taskItems.size() == 0) {
-                ApplicationLogger.info("not find data");
+                log.info("not find data");
                 return;
             }
 
@@ -103,9 +93,9 @@ public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleEla
             throw new RuntimeException(e);
         } finally {
             if (isPrintLog) {
-                ApplicationLogger.info(logSB.toString());
+                log.info(logSB.toString());
             }
-            ApplicationLogger.info(getTaskCode() + "_end");
+            log.info(getTaskCode() + "_end");
             jobEnd(shardingContext);
         }
 
@@ -118,45 +108,26 @@ public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleEla
 
     }
 
-    private void initContextValue() {
-        ApplicationLogger.setRequestId(null);
-        SessionVo sessionVo = new SessionVo();
-        sessionVo.setEmpCode("taskRunner");
-        sessionVo.setUserName("任务执行器");
-        sessionVo.setUserEmail("@taskRunner");
-        ApplicationEnvironment.setSessionVoThreadLocal(sessionVo);
-    }
-
     /**
      * 返回任务的线程配置，处理数据量信息
-     *
-     * @return
      */
     protected abstract TaskConfig getTaskConfig();
 
-
     /**
      * 异常处理
-     *
-     * @param jobException
      */
     @Override
     public void handleJobExecutionException(final JobException jobException) {
-        ApplicationLogger.error("[" + getTaskCode() + "] execute error", jobException);
+        log.error("[" + getTaskCode() + "] execute error", jobException);
     }
 
     /**
      * 处理一个任务
-     *
-     * @param taskItem
-     * @return
      */
     protected abstract boolean processOne(ElasticTaskItem taskItem);
 
     /**
      * 是否批量处理
-     *
-     * @return
      */
     protected boolean isProcessAll() {
         return false;
@@ -164,9 +135,6 @@ public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleEla
 
     /**
      * 批量批量任务
-     *
-     * @param taskConfig
-     * @param taskItems
      */
     protected void processAll(TaskConfig taskConfig, List<ElasticTaskItem> taskItems) {
         throw new RuntimeException(" imp processAll method in subclass and imp isProcessAll method ");
@@ -174,19 +142,11 @@ public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleEla
 
     /**
      * 任务名称
-     *
-     * @return
      */
     protected abstract String getTaskCode();
 
     /**
      * 获取符合条件的惹怒
-     *
-     * @param shardingContext
-     * @return
-     * @throws Exception
      */
     protected abstract List<ElasticTaskItem> getAllProcessData(TaskConfig taskConfig, JobExecutionMultipleShardingContext shardingContext) throws Exception;
-
-
 }

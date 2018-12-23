@@ -1,4 +1,4 @@
-package com.ziroom.bsrd.elasticjob.job.core;
+package com.amy.pie.elasticjob.job.core;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
