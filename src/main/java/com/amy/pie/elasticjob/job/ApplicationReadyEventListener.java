@@ -1,11 +1,13 @@
 package com.amy.pie.elasticjob.job;
 
 import com.amy.pie.elasticjob.job.vo.JobInfo;
-import com.dangdang.ddframe.job.api.JobScheduler;
-import com.dangdang.ddframe.job.api.config.JobConfigurationFactory;
-import com.dangdang.ddframe.job.api.config.impl.SimpleJobConfiguration;
-import com.dangdang.ddframe.reg.zookeeper.ZookeeperRegistryCenter;
 import com.amy.pie.elasticjob.job.annotation.JobConfig;
+import com.dangdang.ddframe.job.config.JobCoreConfiguration;
+import com.dangdang.ddframe.job.config.simple.SimpleJobConfiguration;
+import com.dangdang.ddframe.job.lite.api.JobScheduler;
+import com.dangdang.ddframe.job.lite.config.LiteJobConfiguration;
+import com.dangdang.ddframe.job.lite.spring.api.SpringJobScheduler;
+import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperRegistryCenter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -50,9 +52,12 @@ public class ApplicationReadyEventListener implements ApplicationListener<Contex
 
         // 启动作业
         for (JobInfo jobInfo : data) {
-            SimpleJobConfiguration simpleJobConfiguration = JobConfigurationFactory.createSimpleJobConfigurationBuilder(jobInfo.getJobName(),
-                    jobInfo.getJobClass(), jobInfo.getShardingTotalCount(), jobInfo.getCron()).overwrite(jobInfo.isOverwrite()).description(jobInfo.getDescription()).failover(true).build();
-            new JobScheduler(zookeeperRegistryCenter, simpleJobConfiguration).init();
+            LiteJobConfiguration liteJobConfiguration = LiteJobConfiguration.newBuilder(new SimpleJobConfiguration(
+                    JobCoreConfiguration.newBuilder(jobInfo.getJobName(), jobInfo.getCron(), jobInfo.getShardingTotalCount()).build()
+                    , jobInfo.getJobClass().getCanonicalName())
+            ).overwrite(true).build();
+
+            new JobScheduler(zookeeperRegistryCenter, liteJobConfiguration).init();
         }
 
     }

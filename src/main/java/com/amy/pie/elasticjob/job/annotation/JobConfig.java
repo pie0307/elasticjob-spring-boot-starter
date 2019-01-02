@@ -1,7 +1,7 @@
 package com.amy.pie.elasticjob.job.annotation;
 
 
-import com.dangdang.ddframe.job.api.config.impl.JobType;
+import com.dangdang.ddframe.job.api.JobType;
 
 import java.lang.annotation.*;
 

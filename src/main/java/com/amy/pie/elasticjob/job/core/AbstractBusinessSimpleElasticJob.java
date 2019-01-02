@@ -2,20 +2,18 @@ package com.amy.pie.elasticjob.job.core;
 
 import com.amy.pie.elasticjob.job.vo.ElasticTaskItem;
 import com.amy.pie.elasticjob.job.vo.TaskConfig;
-import com.dangdang.ddframe.job.api.JobExecutionMultipleShardingContext;
-import com.dangdang.ddframe.job.exception.JobException;
-import com.dangdang.ddframe.job.plugin.job.type.simple.AbstractSimpleElasticJob;
+import com.dangdang.ddframe.job.api.ShardingContext;
+import com.dangdang.ddframe.job.api.simple.SimpleJob;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 批量处理数据任务
  */
 @Slf4j
-public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleElasticJob {
+public abstract class AbstractBusinessSimpleElasticJob implements SimpleJob {
 
     private ThreadLocal<ElasticTaskItem.RunnerContext> runnerContextThreadLocal = new ThreadLocal<>();
 
@@ -29,15 +27,14 @@ public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleEla
     /**
      * 任务调度入口  由ElasticJob 触发
      */
-    public void process(final JobExecutionMultipleShardingContext shardingContext) {
+    @Override
+    public void execute(ShardingContext shardingContext) {
+        log.info("分片项000000 -----   " + shardingContext.getShardingItem() + "-----" + Thread.currentThread().getName());
+        if (!jobStart(shardingContext)) {
+            return;
+        }
 
-        jobStart(shardingContext);
-
-        StringBuilder logSB = new StringBuilder();
-        boolean isPrintLog = false;
         try {
-
-            logSB.append(getTaskCode() + "_task Start").append("-");
 
             log.info(getTaskCode() + "_begin");
 
@@ -46,37 +43,28 @@ public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleEla
             runnerContextThreadLocal.set(new ElasticTaskItem.RunnerContext(getTaskCode(), taskConfig));
 
             List<ElasticTaskItem> taskItems = getAllProcessData(taskConfig, shardingContext);
-            //得到分片项
-            List<Integer> shardingItems = shardingContext.getShardingItems();
-            if (shardingItems == null || shardingItems.isEmpty()) {
-                logSB.append("No sharding items");
-                log.info(logSB.toString());//警告，该服务器未分配到分片项
-                return;
-            }
 
-            //处理分片项和实际数据的对应关系
-            List<ElasticTaskItem> realToBeExecutedIdList = new ArrayList<>();
-            int shardingTotalCount = shardingContext.getShardingTotalCount();//分片总数
             //not find data
             if (taskItems == null || taskItems.size() == 0) {
                 log.info("not find data");
                 return;
             }
 
+            //处理分片项和实际数据的对应关系
+            List<ElasticTaskItem> realToBeExecutedIdList = Lists.newArrayList();
+
             for (int i = 0; i < taskItems.size(); i++) {
+
                 if (taskItems.get(i).getTaskId() == 0) {
                     throw new Exception(" taskId is not allow 0 ");
                 }
-                int shardingItem = (int) taskItems.get(i).getTaskId() % shardingTotalCount;
-                if (shardingItems.contains(shardingItem)) {
+
+                Long shardingItem = taskItems.get(i).getTaskId() % shardingContext.getShardingTotalCount();
+                if (shardingContext.getShardingItem() == shardingItem) {
                     realToBeExecutedIdList.add(taskItems.get(i));
                 }
             }
 
-            logSB.append("Execute job count:" + realToBeExecutedIdList.size()).append("|");
-            if (realToBeExecutedIdList.size() > 0) {
-                isPrintLog = true;
-            }
             List<ElasticTaskItem> taskItems_ = Lists.newArrayList();
             for (ElasticTaskItem taskItem : realToBeExecutedIdList) {
                 if (!isProcessAll()) {
@@ -92,19 +80,16 @@ public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleEla
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            if (isPrintLog) {
-                log.info(logSB.toString());
-            }
             log.info(getTaskCode() + "_end");
             jobEnd(shardingContext);
         }
-
     }
 
-    private void jobStart(JobExecutionMultipleShardingContext shardingContext) {
+    private boolean jobStart(ShardingContext shardingContext) {
+        return true;
     }
 
-    protected void jobEnd(JobExecutionMultipleShardingContext shardingContext) {
+    protected void jobEnd(ShardingContext shardingContext) {
 
     }
 
@@ -112,14 +97,6 @@ public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleEla
      * 返回任务的线程配置，处理数据量信息
      */
     protected abstract TaskConfig getTaskConfig();
-
-    /**
-     * 异常处理
-     */
-    @Override
-    public void handleJobExecutionException(final JobException jobException) {
-        log.error("[" + getTaskCode() + "] execute error", jobException);
-    }
 
     /**
      * 处理一个任务
@@ -148,5 +125,5 @@ public abstract class AbstractBusinessSimpleElasticJob extends AbstractSimpleEla
     /**
      * 获取符合条件的惹怒
      */
-    protected abstract List<ElasticTaskItem> getAllProcessData(TaskConfig taskConfig, JobExecutionMultipleShardingContext shardingContext) throws Exception;
+    protected abstract List<ElasticTaskItem> getAllProcessData(TaskConfig taskConfig, ShardingContext shardingContext) throws Exception;
 }

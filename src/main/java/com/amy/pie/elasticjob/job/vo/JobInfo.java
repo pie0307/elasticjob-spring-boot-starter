@@ -1,7 +1,7 @@
 package com.amy.pie.elasticjob.job.vo;
 
 
-import com.dangdang.ddframe.job.api.config.impl.JobType;
+import com.dangdang.ddframe.job.api.JobType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

@@ -2,10 +2,10 @@ package com.amy.pie.elasticjob.job;
 
 import com.amy.pie.elasticjob.job.core.TaskRunner;
 import com.amy.pie.elasticjob.job.itf.ITaskExecutor;
-import com.dangdang.ddframe.job.api.JobExecutionMultipleShardingContext;
 import com.amy.pie.elasticjob.job.core.AbstractBusinessSimpleElasticJob;
 import com.amy.pie.elasticjob.job.vo.ElasticTaskItem;
 import com.amy.pie.elasticjob.job.vo.TaskConfig;
+import com.dangdang.ddframe.job.api.ShardingContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -79,7 +79,7 @@ public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleEla
      * 获取需要处理任务的数据，数据需要包装成<code>ElasticTaskItem</code>
      */
     @Override
-    protected abstract List<ElasticTaskItem> getAllProcessData(TaskConfig taskConfig, JobExecutionMultipleShardingContext shardingContext) throws Exception;
+    protected abstract List<ElasticTaskItem> getAllProcessData(TaskConfig taskConfig, ShardingContext shardingContext) throws Exception;
 
     /**
      * 多线程处理时，单个任务的处理器<br/>

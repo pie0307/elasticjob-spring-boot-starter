@@ -16,7 +16,7 @@ public class ElasticTaskItem implements Serializable {
     /**
      * 任务id 必须唯一，做为分片标识
      */
-    private long taskId;
+    private Long taskId;
 
     /**
      * 任务状态

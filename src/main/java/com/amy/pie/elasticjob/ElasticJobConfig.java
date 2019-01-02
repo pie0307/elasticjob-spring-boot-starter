@@ -1,20 +1,22 @@
 package com.amy.pie.elasticjob;
 
-import com.dangdang.ddframe.reg.base.CoordinatorRegistryCenter;
-import com.dangdang.ddframe.reg.zookeeper.ZookeeperConfiguration;
-import com.dangdang.ddframe.reg.zookeeper.ZookeeperRegistryCenter;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dangdang.ddframe.job.reg.base.CoordinatorRegistryCenter;
+import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperConfiguration;
+import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperRegistryCenter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.Resource;
 
 @Configuration
 public class ElasticJobConfig {
 
-    @Autowired
-    ZookeeperProperties zookeeperProperties;
+    @Resource
+    private ZookeeperProperties zookeeperProperties;
 
     @Bean(initMethod = "init", destroyMethod = "close")
     public CoordinatorRegistryCenter regCenter() {
+
         ZookeeperConfiguration zookeeperConfiguration =
                 new ZookeeperConfiguration(zookeeperProperties.getServerLists(), zookeeperProperties.getNamespace());
 
