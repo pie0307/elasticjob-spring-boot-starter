@@ -13,6 +13,11 @@ Elastic-Job-Lite 提供三种自带的作业分片策略：
 如果有3台作业节点，分成8片，则每台作业节点分到的分片是：1=[0,1,6], 2=[2,3,7], 3=[4,5] 
 如果有3台作业节点，分成10片，则每台作业节点分到的分片是：1=[0,1,2,9], 2=[3,4,5], 3=[6,7,8]
 
+#如何实现主备
+
+通过作业配置设置总分片数为 1 ( JobCoreConfiguration.shardingTotalCount = 1 )，
+只有一个作业分片能够分配到作业分片项，从而达到一主N备。
+
 
 #OdevitySortByNameJobShardingStrategy：根据作业名的哈希值奇偶数决定IP升降序算法的分片策略。
 
@@ -27,11 +32,10 @@ Elastic-Job-Lite 提供三种自带的作业分片策略：
 
 #RotateServerByNameJobShardingStrategy：根据作业名的哈希值对作业节点列表进行轮转的分片策略。
 
+RotateServerByNameJobShardingStrategy，根据作业名的哈希值对作业节点列表进行轮转的分片策略。
+如果有 3 台作业节点，顺序为 [0, 1, 2]，
+如果作业名的哈希值根据作业分片总数取模为 1, 作业节点顺序变为 [1, 2, 0]。
+
 #分片的目的
 将作业的负载合理的分配到不同的作业节点上，要避免分片策略总是让固定的作业节点负载特别大，
 其它工作节点负载特别小。
-
-#如何实现主备
-
-通过作业配置设置总分片数为 1 ( JobCoreConfiguration.shardingTotalCount = 1 )，
-只有一个作业分片能够分配到作业分片项，从而达到一主N备。

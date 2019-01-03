@@ -5,6 +5,7 @@ import com.amy.pie.elasticjob.job.vo.JobInfo;
 import com.dangdang.ddframe.job.config.JobCoreConfiguration;
 import com.dangdang.ddframe.job.config.simple.SimpleJobConfiguration;
 import com.dangdang.ddframe.job.lite.api.JobScheduler;
+import com.dangdang.ddframe.job.lite.api.strategy.impl.OdevitySortByNameJobShardingStrategy;
 import com.dangdang.ddframe.job.lite.config.LiteJobConfiguration;
 import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperRegistryCenter;
 import com.google.common.collect.Lists;
@@ -55,7 +56,7 @@ public class ApplicationReadyEventListener implements ApplicationListener<Contex
             LiteJobConfiguration liteJobConfiguration = LiteJobConfiguration.newBuilder(new SimpleJobConfiguration(
                     JobCoreConfiguration.newBuilder(jobInfo.getJobName(), jobInfo.getCron(), jobInfo.getShardingTotalCount()).build()
                     , jobInfo.getJobClass().getCanonicalName())
-            ).overwrite(true).build();
+            ).jobShardingStrategyClass(OdevitySortByNameJobShardingStrategy.class.getName()).overwrite(true).build();
 
             new JobScheduler(zookeeperRegistryCenter, liteJobConfiguration).init();
         }

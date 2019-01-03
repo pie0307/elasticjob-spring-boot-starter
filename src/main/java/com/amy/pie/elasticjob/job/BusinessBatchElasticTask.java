@@ -6,13 +6,13 @@ import com.amy.pie.elasticjob.job.core.AbstractBusinessSimpleElasticJob;
 import com.amy.pie.elasticjob.job.vo.ElasticTaskItem;
 import com.amy.pie.elasticjob.job.vo.TaskConfig;
 import com.dangdang.ddframe.job.api.ShardingContext;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StopWatch;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -54,16 +54,22 @@ public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleEla
         long start = System.currentTimeMillis();
         CountDownLatch latch = null;
         log.info(getTaskCode() + " handle : " + taskItems.size());
+
         try {
             Map<Integer, List<ElasticTaskItem>> data = parseData(taskConfig.getThreadNum(), taskItems);
+
             latch = new CountDownLatch(data.size());
+
             Iterator<Map.Entry<Integer, List<ElasticTaskItem>>> alltask = data.entrySet().iterator();
             while (alltask.hasNext()) {
+
                 Map.Entry<Integer, List<ElasticTaskItem>> item = alltask.next();
+
                 TaskRunner taskRunner = new TaskRunner(getRunnerContext(), item.getValue(), getTaskExecutorHandler());
                 taskRunner.setCountDownLatch(latch);
                 taskRunner.setTaskCode(getTaskCode());
                 taskRunner.setStopWatch(new StopWatch());
+
                 getExecutorService().submit(taskRunner);
             }
         } catch (Exception e) {
@@ -110,19 +116,19 @@ public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleEla
      * 把要处理的数据添加的分组
      */
     private void addToMap(Map<Integer, List<ElasticTaskItem>> map, int index, ElasticTaskItem item) {
-        List<ElasticTaskItem> data = map.get(Integer.valueOf(index));
+        List<ElasticTaskItem> data = map.get(index);
         if (data == null) {
-            data = new ArrayList<ElasticTaskItem>();
+            data = Lists.newArrayList();
         }
         data.add(item);
-        map.put(Integer.valueOf(index), data);
+        map.put(index, data);
     }
 
     /**
      * 任务分发
      */
     private Map<Integer, List<ElasticTaskItem>> parseData(int threadnum, List<ElasticTaskItem> handledata) {
-        Map<Integer, List<ElasticTaskItem>> map = new HashMap<Integer, List<ElasticTaskItem>>();
+        Map<Integer, List<ElasticTaskItem>> map = new HashMap<>();
         for (int i = 0; i < handledata.size(); i++) {
             for (int index = 0; index < threadnum; index++) {
                 if (i % threadnum == index) {
