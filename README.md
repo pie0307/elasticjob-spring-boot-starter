@@ -8,7 +8,7 @@
     <dependency>
         <groupId>com.amy.pie</groupId>
         <artifactId>elasticjob-spring-boot-starter</artifactId>
-        <version>2.0.0</version>
+        <version>1.0.0-SNAPSHOT</version>
     </dependency>
 
     ```

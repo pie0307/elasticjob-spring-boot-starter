@@ -1,13 +1,13 @@
 package com.amy.pie.elasticjob.job;
 
-import com.amy.pie.elasticjob.job.vo.JobInfo;
 import com.amy.pie.elasticjob.job.annotation.JobConfig;
+import com.amy.pie.elasticjob.job.vo.JobInfo;
 import com.dangdang.ddframe.job.config.JobCoreConfiguration;
 import com.dangdang.ddframe.job.config.simple.SimpleJobConfiguration;
 import com.dangdang.ddframe.job.lite.api.JobScheduler;
 import com.dangdang.ddframe.job.lite.config.LiteJobConfiguration;
-import com.dangdang.ddframe.job.lite.spring.api.SpringJobScheduler;
 import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperRegistryCenter;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +51,7 @@ public class ApplicationReadyEventListener implements ApplicationListener<Contex
 
         // 启动作业
         for (JobInfo jobInfo : data) {
+
             LiteJobConfiguration liteJobConfiguration = LiteJobConfiguration.newBuilder(new SimpleJobConfiguration(
                     JobCoreConfiguration.newBuilder(jobInfo.getJobName(), jobInfo.getCron(), jobInfo.getShardingTotalCount()).build()
                     , jobInfo.getJobClass().getCanonicalName())
@@ -71,13 +71,17 @@ public class ApplicationReadyEventListener implements ApplicationListener<Contex
     }
 
     private List<JobInfo> getJobConfig() throws BeansException {
-        List<JobInfo> jobInfos = new LinkedList();
+
+        List<JobInfo> jobInfos = Lists.newArrayList();
         Map<String, Object> beanDefinitionNames = getApplicationContext().getBeansWithAnnotation(JobConfig.class);
         Iterator<Map.Entry<String, Object>> set = beanDefinitionNames.entrySet().iterator();
+
         while (set.hasNext()) {
-            JobInfo jobInfo = new JobInfo();
+
             Map.Entry<String, Object> objectEntry = set.next();
             JobConfig jobConfig = objectEntry.getValue().getClass().getAnnotation(JobConfig.class);
+
+            JobInfo jobInfo = new JobInfo();
             if (jobConfig.jobName() == null || jobConfig.jobName().trim().length() == 0) {
                 jobInfo.setJobName(objectEntry.getValue().getClass().getSimpleName());
             } else {
@@ -90,7 +94,9 @@ public class ApplicationReadyEventListener implements ApplicationListener<Contex
             jobInfo.setOverwrite(jobConfig.overwrite());
             jobInfo.setDescription(jobConfig.description());
             jobInfos.add(jobInfo);
+
         }
+
         return jobInfos;
     }
 }

@@ -8,6 +8,7 @@ import com.amy.pie.elasticjob.job.vo.TaskConfig;
 import com.dangdang.ddframe.job.api.ShardingContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.StopWatch;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -61,7 +62,9 @@ public abstract class BusinessBatchElasticTask extends AbstractBusinessSimpleEla
                 Map.Entry<Integer, List<ElasticTaskItem>> item = alltask.next();
                 TaskRunner taskRunner = new TaskRunner(getRunnerContext(), item.getValue(), getTaskExecutorHandler());
                 taskRunner.setCountDownLatch(latch);
-                Future<?> future = getExecutorService().submit(taskRunner);
+                taskRunner.setTaskCode(getTaskCode());
+                taskRunner.setStopWatch(new StopWatch());
+                getExecutorService().submit(taskRunner);
             }
         } catch (Exception e) {
             log.error("bath handle fail：", e);

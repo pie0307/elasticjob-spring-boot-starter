@@ -29,7 +29,7 @@ public abstract class AbstractBusinessSimpleElasticJob implements SimpleJob {
      */
     @Override
     public void execute(ShardingContext shardingContext) {
-        log.info("分片项000000 -----   " + shardingContext.getShardingItem() + "-----" + Thread.currentThread().getName());
+
         if (!jobStart(shardingContext)) {
             return;
         }
@@ -85,7 +85,7 @@ public abstract class AbstractBusinessSimpleElasticJob implements SimpleJob {
         }
     }
 
-    private boolean jobStart(ShardingContext shardingContext) {
+    protected boolean jobStart(ShardingContext shardingContext) {
         return true;
     }
 

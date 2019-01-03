@@ -11,6 +11,7 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
+@ToString
 public class ElasticTaskItem implements Serializable {
 
     /**

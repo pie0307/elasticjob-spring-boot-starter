@@ -1,31 +1,30 @@
 package com.amy.pie.elasticjob.job.core;
 
-import java.util.concurrent.Callable;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StopWatch;
+
 import java.util.concurrent.CountDownLatch;
 
-public abstract class SuperTask<T> implements Callable<T> {
+@Getter
+@Setter
+@Slf4j
+public abstract class SuperTask implements Runnable {
 
-    public static final String SuperTaskStatus_SUCCESS = "SUCCESS";
-
-    public static final String SuperTaskStatus_ERROR = "ERROR";
+    private String taskCode;
 
     private CountDownLatch countDownLatch;
 
-    public void setCountDownLatch(CountDownLatch countDownLatch) {
-        this.countDownLatch = countDownLatch;
-    }
-
-    public CountDownLatch getCountDownLatch() {
-        return countDownLatch;
-    }
+    private StopWatch stopWatch;
 
     protected void workStart() {
-
+        stopWatch.start(taskCode);
     }
 
     protected void workDone() {
         this.countDownLatch.countDown();
+        this.stopWatch.stop();
+        log.info("prettyPrint ---> " + stopWatch.prettyPrint());
     }
-
-
 }

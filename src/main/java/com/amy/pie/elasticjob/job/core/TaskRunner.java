@@ -34,17 +34,17 @@ public class TaskRunner extends SuperTask {
     }
 
     @Override
-    public Object call() {
+    public void run() {
 
         String threadName = runnerContext.getTaskCode() + "_" + Thread.currentThread().getName();
         log.info(threadName + " start ");
         if (runnerContext == null) {
             log.info(" runnerContextThreadLocal is null");
-            return SuperTaskStatus_ERROR;
+            return;
         }
         if (value == null || value.isEmpty()) {
             log.info(threadName + " handle size=0 ");
-            return SuperTaskStatus_SUCCESS;
+            return;
         }
 
         long start = System.currentTimeMillis();
@@ -59,10 +59,8 @@ public class TaskRunner extends SuperTask {
                     log.error(threadName + " run error ", e);
                 }
             }
-            return SuperTaskStatus_SUCCESS;
         } catch (Exception e) {
             log.error(threadName + " run error ", e);
-            return SuperTaskStatus_ERROR;
         } finally {
             workDone();
             long times = (System.currentTimeMillis() - start);
